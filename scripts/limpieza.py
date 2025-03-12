@@ -23,7 +23,7 @@ def detect_missing_extra_fields(row):
 
 def load_and_find_errors():
     print("Cargando datos")
-    field_types = open_dict("../data/metadata_types.pkl")
+    field_types = open_dict("../data/metadata_types_generated.pkl")
     print("Tipos de campos cargados")
     print(f'field_types: {field_types}')
     errores = 0
