@@ -1,5 +1,29 @@
 import pandas as pd
 
+catalogos = {}
+
+def open_catalog_file(file_path):
+    '''
+    Open a catalog xlsx file where:
+        - sheet name: catalog name
+    '''
+    catalog_dfs = {}
+
+    try:
+        catalog = pd.read_excel(file_path, sheet_name=None)
+    except:
+        print("Error al abrir el archivo de catalogos")
+    
+    if catalog is not None:
+        print(catalog.keys())
+        for key in catalog.keys():
+            print(key)
+            df_catalog = catalog[key]
+            catalog_name = key.split(" ")[-1]
+            catalog_dfs[catalog_name] = df_catalog
+
+    print(catalog_dfs.keys())
+
 def open_metadata_file(file_path):
     '''
     Open a metadata  xlsx file where:
@@ -9,7 +33,6 @@ def open_metadata_file(file_path):
         - fourth row: metadata format
     '''
     local_metadata_types = {}
-    formats_dicc = {'TEXTO': 'str', 'AAAA-MM-DD': 'datetime64[ns]'}
     try:
         metadata = pd.read_excel(file_path)
     except:
@@ -25,6 +48,6 @@ def open_metadata_file(file_path):
 
     return local_metadata_types
         
-metadata_types = open_metadata_file("../data/metadatos_descriptores.xlsx")
 
-print(metadata_types)
+open_catalog_file("../data/catalogos.xlsx")
+# metadata_types = open_metadata_file("../data/metadatos_descriptores.xlsx")
