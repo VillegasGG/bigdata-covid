@@ -163,6 +163,6 @@ def main():
         print(result[key])
 
     # SAVE METADATA TYPES 
-    save_dict(result, "../data/metadata_types.pkl")
+    save_dict(result, "../data/metadata_types_generated.pkl")
     
 main()
