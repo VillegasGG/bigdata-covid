@@ -3,6 +3,7 @@ import numpy as np
 import os
 import csv
 import time
+import pickle
 
 ini = time.time_ns()
 
@@ -20,8 +21,11 @@ def detect_missing_extra_fields(row):
         return True
     return False
 
-def load_data():
+def load_and_find_errors():
     print("Cargando datos")
+    field_types = open_dict("../data/metadata_types.pkl")
+    print("Tipos de campos cargados")
+    print(f'field_types: {field_types}')
     errores = 0
     i = 0
     with open("../data/220720COVID19MEXICO.csv", "r", encoding="utf-8") as file:
@@ -41,10 +45,21 @@ def load_data():
         
     print("Datos cargados")
 
-load_data()
+def open_dict(file_path):
+    with open(file_path, 'rb') as file:
+        dic = pickle.load(file)
+        return dic
 
-fin = time.time_ns()
+def main():
+    ini = time.time_ns()
+    print("Limpieza de datos")
+    load_and_find_errors()
+    print("Fin de la limpieza")
+    fin = time.time_ns()
+    print(f"Tiempo de ejecución: {(fin-ini)/1e9} segundos")
 
-print(f"Tiempo de ejecución: {(fin-ini)/1e9} segundos")
+
+if __name__ == "__main__":
+    main()
 
 
