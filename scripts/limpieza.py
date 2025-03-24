@@ -4,6 +4,7 @@ import os
 import csv
 import time
 import pickle
+from origen import validate_origen
 
 ini = time.time_ns()
 
