@@ -17,7 +17,6 @@ def adding_new_row_to_csv(row, file_path):
 
 def detect_missing_extra_fields(row):
     if len(row) != METADATA_LEN:
-        print(f"Error en registro: {row}, len: {len(row)}")
         adding_new_row_to_csv(row, "../data/error_len.csv")
         return True
     return False
@@ -30,8 +29,6 @@ def save_error_row(row, file_path):
 def load_and_find_errors():
     print("Cargando datos")
     field_types = open_dict("../data/metadata_types_generated.pkl")
-    print("Tipos de campos cargados")
-    print(f'field_types: {field_types}')
     origen_errors = 0
     errores = 0
     i = 0
