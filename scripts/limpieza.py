@@ -15,7 +15,7 @@ def load_data():
         metadata = next(data_reader)
         print(metadata)
         for row in data_reader:
-            if(i%1000000 == 0):
+            if(i%1_000_000 == 0):
                 print(i, row)
             i += 1
         print(f"Total de registros: {i}")
