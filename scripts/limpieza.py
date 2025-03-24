@@ -28,7 +28,6 @@ def save_error_row(row, file_path):
 
 def load_and_find_errors():
     print("Cargando datos")
-    field_types = open_dict("../data/metadata_types_generated.pkl")
     origen_errors = 0
     errores = 0
     i = 0
@@ -43,12 +42,12 @@ def load_and_find_errors():
             error = detect_missing_extra_fields(row)
             if error:
                 errores += 1
-                print(i, row)
+                # print(i, row)
             i += 1
 
             if is_origen_error:
                 # save origen errors in a txt file
-                save_error_row(row, "../data/error_origen.csv") 
+                save_error_row(row, "../data/error_origen.txt") 
                 origen_errors += 1
 
         print(f"Total de registros: {i}")
