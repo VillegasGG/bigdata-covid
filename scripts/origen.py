@@ -18,7 +18,14 @@ print(catalogo_origen)
 # If not, it is an error, show the row
 
 def validate_origen(row):
-    if int(row) not in [1, 2, 99]:
-        print(f"Error en registro: {row}, value: {row}")
+    actual_value = row[2]
+    try:
+        actual_value = int(actual_value)
+        if actual_value not in [1, 2, 99]:
+            print(f"Error ORIGEN en registro: {row}, value: {actual_value}")
+            return True
+    except:
+        print(f"Error ORIGEN en registro: {row}, value: {actual_value}")
         return True
+
     return False
