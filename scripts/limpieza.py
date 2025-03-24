@@ -4,6 +4,7 @@ import os
 import csv
 import time
 import pickle
+from origen import validate_origen
 
 ini = time.time_ns()
 
@@ -26,21 +27,29 @@ def load_and_find_errors():
     field_types = open_dict("../data/metadata_types_generated.pkl")
     print("Tipos de campos cargados")
     print(f'field_types: {field_types}')
+    origen_errors = 0
     errores = 0
     i = 0
     with open("../data/220720COVID19MEXICO.csv", "r", encoding="utf-8") as file:
         data_reader = csv.reader(file)
         # Print metadata of first row
         metadata = next(data_reader)
+        is_origen_error = False
         print(metadata)
         for row in data_reader:
+            is_origen_error = validate_origen(row)
             error = detect_missing_extra_fields(row)
             if error:
                 errores += 1
                 print(i, row)
             i += 1
+
+            if is_origen_error:
+                origen_errors += 1
+
         print(f"Total de registros: {i}")
         print(f"Total de errores: {errores}")
+        print(f"Total de errores en origen: {origen_errors}")
         
     print("Datos cargados")
 
