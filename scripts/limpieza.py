@@ -5,6 +5,7 @@ import csv
 import time
 import pickle
 from origen import validate_origen
+from tqdm import tqdm
 
 ini = time.time_ns()
 
@@ -38,7 +39,7 @@ def load_and_find_errors():
         metadata = next(data_reader)
         is_origen_error = False
         print(metadata)
-        for row in data_reader:
+        for row in tqdm(data_reader):
             is_origen_error = validate_origen(row)
             error = detect_missing_extra_fields(row)
             if error:
