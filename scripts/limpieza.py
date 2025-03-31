@@ -5,6 +5,7 @@ import csv
 import time
 import pickle
 from origen import validate_origen
+from sector import validate_sector
 from tqdm import tqdm
 
 ini = time.time_ns()
@@ -27,10 +28,16 @@ def save_error_row(row, file_path):
         writer = csv.writer(file)
         writer.writerow(row)
 
+def show_final_errors(length_errors, origen_errors, sector_errors):
+    print(f"Total de errores: {length_errors}")
+    print(f"Total de errores en origen: {origen_errors}")
+    print(f"Total de errores en sector: {sector_errors}")
+
 def load_and_find_errors():
     print("Cargando datos")
     field_types = open_dict("../data/metadata_types_generated.pkl")
     origen_errors = 0
+    sector_errors = 0
     errores = 0
     i = 0
     with open("../data/220720COVID19MEXICO.csv", "r", encoding="utf-8") as file:
@@ -38,9 +45,11 @@ def load_and_find_errors():
         # Print metadata of first row
         metadata = next(data_reader)
         is_origen_error = False
+        is_sector_error = False
         print(metadata)
         for row in tqdm(data_reader):
             is_origen_error = validate_origen(row)
+            is_sector_error = validate_sector(row)
             error = detect_missing_extra_fields(row)
             if error:
                 errores += 1
@@ -52,11 +61,13 @@ def load_and_find_errors():
                 save_error_row(row, "../data/error_origen.csv") 
                 origen_errors += 1
 
+            if is_sector_error:
+                # save sector errors in a txt file
+                save_error_row(row, "../data/error_sector.csv")
+                sector_errors += 1
+
         print(f"Total de registros: {i}")
-        print(f"Total de errores: {errores}")
-        print(f"Total de errores en origen: {origen_errors}")
-        
-    print("Datos cargados")
+        show_final_errors(errores, origen_errors, sector_errors)
 
 def open_dict(file_path):
     with open(file_path, 'rb') as file:
