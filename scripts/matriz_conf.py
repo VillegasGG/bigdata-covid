@@ -1,7 +1,10 @@
 import csv
 import time
 import pickle
+import numpy as np
 import pandas as pd
+import matplotlib as plt
+from sklearn import metrics
 
 dict_final = {[1,2,3] : "Positiva", 7 : "Negativa", [4,5,6] : "Sin Muestra"}
 dict_res_lab = {"1": "positivo", "2" : "negativo"}
@@ -12,6 +15,11 @@ dict_ent[97] = [0,0,0,0]
 dict_ent[98] = [0,0,0,0]
 dict_ent[99] = [0,0,0,0]
 
+actual_total = []
+predicted_total = []
+
+dict_ent_actual = {x: [] for x in range(1,37)}
+dict_ent_predicted = {x: [] for x in range(1,37)}
 
 VP = 0
 FP = 0
@@ -35,24 +43,41 @@ def detect_sector(row, dict_sector, index):
         return True
     return False
 
+def add_values_list(act_v, pred_v, entity):
+    actual_total.append(act_v)
+    predicted_total.append(pred_v)
+    dict_ent_actual[entity].append(act_v)
+    dict_ent_predicted[entity].append(pred_v)
+
 def dectect_resultado(row):
     if int(row[4]) in dict_ent.keys():
         # Verdaderos positivos
         if (row[32] == "1" or row[34] == "1") and row[35] in ["1","2","3"]:
             VP+=1
             dict_ent[int(row[4])][0]+=1
+
+            add_values_list(1,1, int(row[4]))
+
         # Falsos positivos
         elif (row[32] == "1" or row[34] == "1") and row[35] == "7":
             FP+=1
             dict_ent[int(row[4])][0]+=1
+
+            add_values_list(0,1, int(row[4]))
+
         # Falsos negativos
         elif (row[32] == "2" or row[34] == "2") and row[35] in ["1","2","3"]:
             FN+=1
             dict_ent[int(row[4])][0]+=1
+
+            add_values_list(1,0, int(row[4]))
+
         # Verdaderos Negativos
         elif (row[32] == "2" or row[34] == "2") and row[35] == "7":
             VN+=1 
             dict_ent[int(row[4])][0]+=1
+
+            add_values_list(0,0, int(row[4]))
 
 #final (real) vs anti (supuesto)
 def dectect_resultado_anti(row):
@@ -61,18 +86,25 @@ def dectect_resultado_anti(row):
         if (row[34] == "1") and row[35] in ["1","2","3"]:
             VP+=1
             dict_ent[int(row[4])][0]+=1
+            add_values_list(1,1, int(row[4]))
+
         # Falsos positivos
         elif (row[34] == "1") and row[35] == "7":
             FP+=1
             dict_ent[int(row[4])][0]+=1
+            add_values_list(0,1, int(row[4]))
+
         # Falsos negativos
         elif (row[34] == "2") and row[35] in ["1","2","3"]:
             FN+=1
             dict_ent[int(row[4])][0]+=1
+            add_values_list(1,0, int(row[4]))
+
         # Verdaderos Negativos
         elif (row[34] == "2") and row[35] == "7":
             VN+=1 
             dict_ent[int(row[4])][0]+=1
+            add_values_list(0,0, int(row[4]))
 
 #final (real) vs lab (supuesto)
 def dectect_resultado_lab(row):
@@ -81,18 +113,22 @@ def dectect_resultado_lab(row):
         if (row[32] == "1") and row[35] in ["1","2","3"]:
             VP+=1
             dict_ent[int(row[4])][0]+=1
+            add_values_list(1,1, int(row[4]))
         # Falsos positivos
         elif (row[32] == "1") and row[35] == "7":
             FP+=1
             dict_ent[int(row[4])][0]+=1
+            add_values_list(0,1, int(row[4]))
         # Falsos negativos
         elif (row[32] == "2") and row[35] in ["1","2","3"]:
             FN+=1
             dict_ent[int(row[4])][0]+=1
+            add_values_list(1,0, int(row[4]))
         # Verdaderos Negativos
         elif (row[32] == "2") and row[35] == "7":
             VN+=1 
             dict_ent[int(row[4])][0]+=1
+            add_values_list(0,0, int(row[4]))
 
 def por_entidad(entidad):
     VP_e = dict_ent[entidad][0]
@@ -140,6 +176,10 @@ def main():
     ini = time.time_ns()
     print("Inicia matriz")
     find_matrix()
+    confusion_matrix = metrics.confusion_matrix(actual_total, predicted_total)
+    cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [0, 1])
+    cm_display.plot()
+    plt.show()
     print("Fin matriz de confusión")
     fin = time.time_ns()
 
