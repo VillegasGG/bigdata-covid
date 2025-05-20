@@ -1,4 +1,5 @@
 import csv
+import os
 import time
 import pickle
 import numpy as np
@@ -41,7 +42,7 @@ def adding_new_row_to_csv(row, file_path):
 
 def detect_sector(row, dict_sector, index):
     if row[3] not in dict_sector.keys():
-        print(f"Error en registro: {row}, \n value: {row[3]} \n registro {index + 1}")
+        #print(f"Error en registro: {row}, \n value: {row[3]} \n registro {index + 1}")
         adding_new_row_to_csv(row, "../data/error_sector.csv")
         return True
     return False
@@ -139,19 +140,36 @@ def dectect_resultado_lab(row):
             dict_ent[int(row[4])][0]+=1
             add_values_list(0,0, int(row[4]))
 
-def por_entidad(entidad):
-    print(dict_ent[10][0:100])
-    VP_e = dict_ent[entidad][0]
-    FP_e = dict_ent[entidad][1]
-    FN_e = dict_ent[entidad][2]
-    VN_e = dict_ent[entidad][3]
-    accuracy_e = (VP_e + VN_e) / (VP_e + VN_e + FP_e + FN_e)
-    specificity_e = VP_e / (VN_e + FP_e)
-    sensitivity_e = VP_e / (VN_e + FN_e)
+def por_entidad(entidad, directory):
+    #print(dict_ent[10][0:5])
+    try:
+        VP_e = dict_ent[entidad][0]
+        FP_e = dict_ent[entidad][1]
+        FN_e = dict_ent[entidad][2]
+        VN_e = dict_ent[entidad][3]
+        accuracy_e = (VP_e + VN_e) / (VP_e + VN_e + FP_e + FN_e)
+        specificity_e = VP_e / (VN_e + FP_e)
+        sensitivity_e = VP_e / (VN_e + FN_e)
 
-    print(f'accuracy {accuracy_e}')
-    print(f'specificity {specificity_e}')
-    print(f'sensitivity {sensitivity_e}')
+        print(f'accuracy {accuracy_e}')
+        print(f'specificity {specificity_e}')
+        print(f'sensitivity {sensitivity_e}')
+
+        confusion_matrix_ent = metrics.confusion_matrix(dict_ent_actual[entidad], dict_ent_predicted[entidad])
+        cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix_ent, display_labels = [0, 1])
+        cm_display.plot()
+        #plt.show()
+
+        filename = 'conf_matrix_' + str(entidad) + '.png'
+        filepath = os.path.join(directory, filename) # creates the full path
+        plt.savefig(filepath)
+
+        # Close the plot
+        plt.close()
+    except Exception as e:
+        print("nah")
+        # Print the exception name
+        print(e.__str__()[0:200])
         
 
 def find_matrix():
@@ -176,7 +194,7 @@ def find_matrix():
     specificity = VP / (VN + FP)
     sensitivity = VP / (VN + FN)
 
-    print(f'resultados país')
+    print(f'--- Resultados país ---')
     print(f'accuracy {accuracy}')
     print(f'specificity {specificity}')
     print(f'sensitivity {sensitivity}')
@@ -187,19 +205,36 @@ def main():
 
     print("Inicia matriz")
     find_matrix()
+    
+    print("fin calculo")
+
+    directory = '../data/images'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
     confusion_matrix = metrics.confusion_matrix(actual_total, predicted_total)
-    print(predicted_total[0:10])
-    print(actual_total[0:10])
+    #print(predicted_total[0:10])
+    #print(actual_total[0:10])
     cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [0, 1])
+    print("Hace matriz")
     cm_display.plot()
-    plt.show()
+    #plt.show()
+    # Save the plot to a specific directory
+    filename = 'conf_matrix_total.png'
+    filepath = os.path.join(directory, filename) # creates the full path
+    plt.title("Matriz de confusión de México")
+    plt.savefig(filepath)
+    print("se guardó la figura")
+    # Close the plot
+    plt.close()
+
     print("Fin matriz de confusión")
 
     fin = time.time_ns()
 
-    for e in range(1, 33):
-        print(f'Para entidad {e}')
-        por_entidad(e)
+    for key in dict_ent.keys():
+        print(f'Para entidad {key}')
+        por_entidad(key, directory)
 
     print(f"Tiempo de ejecución: {(fin-ini)/1e9} segundos")
 
