@@ -19,12 +19,7 @@ print(catalogo_origen)
 
 def validate_origen(row):
     actual_value = row[2]
-    try:
-        actual_value = int(actual_value)
-        if actual_value not in [1, 2, 99]:
-            print(f"Error ORIGEN en registro: {row}, value: {actual_value}")
-            return True
-    except:
+    if actual_value != "1" and actual_value != "2" and actual_value != "99":
         print(f"Error ORIGEN en registro: {row}, value: {actual_value}")
         return True
 
